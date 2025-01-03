@@ -7,6 +7,8 @@ from src.KoGPTDatasets import KoGPTDataset, split_text_into_chunks_with_metadata
 from src.model_manager import ModelManager
 from src.training_manager import Training_Manager
 
+from datasets import load_dataset
+
 
 def parse_args():
     """
@@ -14,10 +16,12 @@ def parse_args():
     """
     parser = argparse.ArgumentParser(description='KoGPT2 Fine-Tuning')
 
-    parser.add_argument('--train_path', type=str, default='../datasets/cleaned_train_dataset.json',
-                        help='훈련 데이터셋 경로')
-    parser.add_argument('--val_path', type=str, default='../datasets/cleaned_valid_dataset.json',
-                        help='검증 데이터셋 경로')
+    # parser.add_argument('--train_path', type=str, default='../datasets/cleaned_train_dataset.json',
+    #                     help='훈련 데이터셋 경로')
+    # parser.add_argument('--val_path', type=str, default='../datasets/cleaned_valid_dataset.json',
+    #                     help='검증 데이터셋 경로')
+    
+    
     parser.add_argument('--model_save_path', type=str, default='./results/kogpt2-finetuned',
                         help='모델 저장 경로')
     parser.add_argument('--max_length', type=int, default=512,
@@ -37,12 +41,13 @@ def main():
 
     os.makedirs(args.model_save_path, exist_ok=True)
     print('✅ 모델 디렉토리 생성 성공!')
-
-    with open(args.train_path, 'r', encoding='utf-8') as train_file:
-        train_data = json.load(train_file)
-
-    with open(args.val_path, 'r', encoding='utf-8') as val_file:
-        val_data = json.load(val_file)
+    
+    dataset = load_dataset(
+        "UICHEOL-HWANG/fairy_dataset"
+    )
+    
+    train_data=dataset['train']
+    val_data=dataset['valid']
 
     model_manager = ModelManager(learning_rate=args.learning_rate, epochs=args.num_epochs)
     tokenizer = model_manager.tokenizer
