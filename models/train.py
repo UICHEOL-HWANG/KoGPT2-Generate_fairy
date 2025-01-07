@@ -7,6 +7,7 @@ from datasets import load_dataset
 from src.KoGPTDatasets import KoGPTDataset, split_text_into_chunks_with_metadata
 from src.model_manager import ModelManager
 from src.training_manager import Training_Manager
+from src.seperation_data import seperated_data
 
 
 def parse_args():
@@ -38,8 +39,7 @@ def main():
 
     # ✅ Hugging Face 데이터셋 로드
     dataset = load_dataset("UICHEOL-HWANG/fairy_dataset")
-    train_data = dataset['train']
-    val_data = dataset['valid']
+    tmp_data = dataset['train']
 
     # ✅ ModelManager 초기화
     model_manager = ModelManager(learning_rate=args.learning_rate, epochs=args.num_epochs)
@@ -47,6 +47,7 @@ def main():
 
     # ✅ 데이터 분할
     print("✅ 데이터 분할 중...")
+    train_data, val_data = seperated_data(tmp_data)
     train_chunks = split_text_into_chunks_with_metadata(train_data, tokenizer, max_length=args.max_length, overlap=50)
     val_chunks = split_text_into_chunks_with_metadata(val_data, tokenizer, max_length=args.max_length, overlap=50)
 
